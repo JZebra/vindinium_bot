@@ -1,5 +1,6 @@
 .DS_Store
 config.yml
+secrets.md
 
 *.gem
 *.rbc

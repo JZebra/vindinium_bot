@@ -1,7 +1,7 @@
-## WHUT? ##
+## Vindinium Bot -- Gizmo
 
-Like the python one, but Ruby!
-See http://vindinium.org/starters
+This is a simple AI bot based off the code from http://vindinium.org/starters.
+
 
 ### USAGE ###
 
