@@ -26,7 +26,7 @@ class Board
       print "#{str} "
       HeroTile.new($1)
     else
-      puts "#{str} -- I have no idea what to do with that."
+      nil
     end
 
   end
@@ -47,7 +47,12 @@ class Board
 
     puts
     matrix
-
+  end
+  
+  def is_tile? loc
+    x, y = loc
+    return true if x > 0 && y > 0 && x < self.size && y < self.size
+    false
   end
 
   def passable? loc
@@ -55,7 +60,7 @@ class Board
     pos = self.tiles[x][y]
     (pos != WALL) and (pos != TAVERN) and (!pos.is_a?(MineTile))
   end
-
+  
   def to loc, direction
 
     # calculate a new location given the direction

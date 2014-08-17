@@ -80,6 +80,7 @@ class Vindinium
   end
 
   def finished?
+    p state
     state['game']['finished']
   end
 

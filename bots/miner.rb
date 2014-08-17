@@ -1,27 +1,27 @@
-require "maze_solver"
+require_relative "maze_solver"
 
 # Simple bot. Tries to take the nearest mine. 
-# Will travel to tavern instead if hp drops below 50
-class MinerBot < BaseBot
+# Will travel to tavern instead if hp drops below 60
+class MinerBot
   include Maze_Solver
   
-  #Dirs are W, A, S, D
-  DIRS = [[1, 0], [0, -1], [-1, 0], [0, 1]]
   DIRECTIONS = { [0, 0] => "Stay", [1, 0] => "North", 
                 [0, -1] => "West", [-1, 0] => "South", [0, 1] => "East" }
   
-  def initialize(state)
+  def init(state)
     @game = Game.new(state)
-    @board = @game.board.parse_tiles
+    @board = @game.board
     # Finds gizmo!
-    @hero = @game.heroes.select { |hero| hero.name == 'Gizmo' }
-    @hero_id = @game.heroes_locs[@hero.pos]
+    @hero = @game.heroes.select { |hero| hero.name == 'Gizmo' }.first
+    @pos = [@hero.pos['y'], @hero.pos['x']]
+    @hero_id = @game.heroes_locs[@pos]
   end
   
   def nearest_tavern
-    src = @hero.pos
+    src = @pos
     #set shortest dst to arbitrarily large value
     shortest_dst = 63
+    nearest = [0,0]
     @game.taverns_locs.each do |pos, hero_id|
       build_branching_paths(src, pos)
       path = find_path
@@ -35,27 +35,30 @@ class MinerBot < BaseBot
   
   # finds the nearest mine that does not belong to our hero
   def nearest_mine
-    src = @hero.pos
+    src = @pos
     shortest_dst = 63
+    nearest = [0,0]
     unowned_mines = @game.mines_locs.reject { |pos, hero_id| hero_id == @hero_id }
     unowned_mines.each do |pos, hero_id|
       build_branching_paths(src, pos)
-      path = find_path
+      path = find_path(pos)
       if path.length < shortest_dst
         shortest_dst = path.length
-        nearest = dst
+        nearest = pos
       end
     end
     nearest
   end
     
-  def move (state)
-    if @hero.hp < 50
+  def move(state)
+    init(state)
+    if @hero.life < 60 && @hero.gold > 2
       path = find_path(nearest_tavern)
     else 
       path = find_path(nearest_mine)
     end
-    dir = [(path[0][0] - @hero.pos[0]), (path[0][1] - @hero.pos[1])]
+    dir = [(path[0][0] - @pos[0]), (path[0][1] - @pos[1])]
+    p dir
     DIRECTIONS[dir]
   end
 end

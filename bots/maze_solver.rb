@@ -1,11 +1,12 @@
 # adapted from app academy maze solver problem
 
 module Maze_Solver
+  DIRS = [[1, 0], [0, -1], [-1, 0], [0, 1]]
 
   #Find distance between two points
-  def find_distance(src, dst)
-    s_row, s_col = pos
-    e_row, e_col = pos
+  def find_distance(dst)
+    s_row, s_col = @pos
+    e_row, e_col = dst
     ((s_row - e_row) + (s_col - e_col)).abs
   end
   
@@ -19,9 +20,9 @@ module Maze_Solver
     end
   end
 
-  def find_manhattan_estimate(point)
-    dist_to_end = find_distance(point)
-    dist_traveled = find_path(point).length
+  def find_manhattan_estimate(dst)
+    dist_to_end = find_distance(dst)
+    dist_traveled = find_path(dst).length
     f = dist_to_end + dist_traveled
   end
 
@@ -48,7 +49,9 @@ module Maze_Solver
     [].tap do |adjs|
       DIRS.each do |d_y, d_x|
         adj = [(row + d_y), (col + d_x)]
-        adjs << adj if @board.passable?(adj)
+        p adj
+        p @board.is_tile?(adj)
+        adjs << adj if @board.is_tile?(adj) && @board.passable?(adj)
       end
     end
   end
@@ -61,31 +64,26 @@ module Maze_Solver
 
     until queue.empty? || @current == dst
       @current = self.send(heuristic, queue)
+      p @current
       queue.delete(@current)
       visited << @current
       #find passable spaces near current pos
       nearby_openings = find_open_paths(@current)
       #add them to queue
       nearby_openings.each do |adj|
-        unless visited.include?(neighbor) || queue.include?(neighbor)
-          queue << neighbor
-          @branching_paths[neighbor] = @current
+        unless visited.include?(adj) || queue.include?(adj)
+          queue << adj
+          @branching_paths[adj] = @current
         end
       end
     end
     @branching_paths
   end
 
-  # def solve(heuristic = :manhattan_heuristic)
-#     build_branching_paths(heuristic)
-#     path = find_path
-#     @maze.travel_path(path)
-#end
-  
   private
   
   def reset_values
     @branching_paths = {}
-    @current = @gizmo.pos
+    @current = @pos
   end
 end 
