@@ -19,6 +19,11 @@ module Maze_Solver
       end
     end
   end
+  
+  def find_next_step(src, dst)
+    path_hash = build_branching_paths(src, dst)
+    path_hash.keys.select { |k| path_hash[k] == src }.first.reverse
+  end
 
   def find_manhattan_estimate(dst)
     dist_to_end = find_distance(dst)
@@ -49,8 +54,6 @@ module Maze_Solver
     [].tap do |adjs|
       DIRS.each do |d_y, d_x|
         adj = [(row + d_y), (col + d_x)]
-        p adj
-        p @board.is_tile?(adj)
         adjs << adj if @board.is_tile?(adj) && @board.passable?(adj)
       end
     end
@@ -64,7 +67,6 @@ module Maze_Solver
 
     until queue.empty? || @current == dst
       @current = self.send(heuristic, queue)
-      p @current
       queue.delete(@current)
       visited << @current
       #find passable spaces near current pos

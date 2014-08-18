@@ -5,8 +5,8 @@ require_relative "maze_solver"
 class MinerBot
   include Maze_Solver
   
-  DIRECTIONS = { [0, 0] => "Stay", [1, 0] => "North", 
-                [0, -1] => "West", [-1, 0] => "South", [0, 1] => "East" }
+  DIRECTIONS = { [0, 0] => "Stay", [1, 0] => "South", 
+                [0, -1] => "West", [-1, 0] => "North", [0, 1] => "East" }
   
   def init(state)
     @game = Game.new(state)
@@ -53,12 +53,18 @@ class MinerBot
   def move(state)
     init(state)
     if @hero.life < 60 && @hero.gold > 2
-      path = find_path(nearest_tavern)
+      dst = find_path(nearest_tavern)
+      puts "getting beer at #{dst}"
     else 
-      path = find_path(nearest_mine)
+      dst = find_path(nearest_mine)
+      puts "getting money at #{dst}"
     end
-    dir = [(path[0][0] - @pos[0]), (path[0][1] - @pos[1])]
+    step = find_next_step(@pos, dst)
+    dir = [(step[1] - @pos[1]), (step[0] - @pos[0])]
+    p step
     p dir
+    p DIRECTIONS[dir]
+    p @pos
     DIRECTIONS[dir]
   end
 end
